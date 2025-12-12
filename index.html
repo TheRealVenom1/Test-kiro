@@ -1,92 +1,94 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>تحذير أخير</title>
+<title>اختبار الشجاعة - لو غلطت مرة = خلاص</title>
 <style>
-  body, html { margin:0; padding:0; height:100%; background:#000; overflow:hidden; color:#0f0; font-family:monospace; }
-  #screen { position:fixed; inset:0; background:#000; display:flex; align-items:center; justify-content:center; flex-direction:column; }
-  .text { font-size:4vw; text-align:center; animation:glitch 0.5s infinite; }
-  .scan { position:absolute; height:4px; width:100%; background:lime; box-shadow:0 0 20px lime; animation:scan 3s linear infinite; }
-  .static { position:fixed; inset:0; pointer-events:none; opacity:0.07; background:url('https://media.giphy.com/media/l2JhrYYxAD6G4qF2M/giphy.gif'); mix-blend-mode:screen; }
-  audio { display:none; }
-
-  @keyframes glitch {
-    0%,100% { text-shadow: 5px 5px #f00, -5px -5px #0ff; }
-    50% { text-shadow: -5px 5px #f0f, 5px -5px #0f0; }
+  body,html{margin:0;padding:0;height:100%;background:#000;color:#0f0;font-family:monospace;overflow:hidden}
+  .container{max-width:800px;margin:40px auto;padding:20px;text-align:center}
+  h1{color:#f00;font-size:3rem;text-shadow:0 0 20px red}
+  .question{font-size:2rem;margin:40px 0;color:lime}
+  .options button{
+    display:block;width:90%;margin:15px auto;padding:20px;font-size:1.5rem;
+    background:#111;border:2px solid #0f0;color:#0f0;cursor:pointer;border-radius:10px;transition:0.3s
   }
-  @keyframes scan {
-    0% { top:-10%; }
-    100% { top:110%; }
-  }
+  .options button:hover{background:#0f0;color:#000;transform:scale(1.05)}
+  .options button.wrong{background:#300 !important;border-color:red !important;color:red}
+  #jumpscare{display:none;position:fixed;inset:0;z-index:9999;background:#000}
+  #jumpscare img{width:100%;height:100%;object-fit:contain}
+  @keyframes shake{0%,100%{transform:translate(0)}10%{transform:translate(-10px,0)}20%{transform:translate(10px,0)}30%{transform:translate(-10px,0)}40%{transform:translate(10px,0)}50%{transform:translate(-10px,0)}60%{transform:translate(10px,0)}70%{transform:translate(-10px,0)}80%{transform:translate(10px,0)}90%{transform:translate(-10px,0)}}
 </style>
 </head>
 <body>
 
-<audio id="scream" src="https://cdn.pixabay.com/download/audio/2022/08/15/audio_2c7e8bbdd3.mp3?filename=horror-scream-145988.mp3" preload="auto"></audio>
-<audio id="bg" loop src="https://cdn.pixabay.com/download/audio/2023/09/21/audio_8f2d8d5f77.mp3?filename=distorted-horror-ambient-145988.mp3"></audio>
+<audio id="scary" src="https://cdn.pixabay.com/download/audio/2022/08/15/audio_2c7e8bbdd3.mp3?filename=horror-scream-145988.mp3" preload="auto"></audio>
 
-<div class="static"></div>
-<div class="scan"></div>
+<div class="container" id="quiz">
+  <h1>اختبار الشجاعة</h1>
+  <p style="font-size:1.8rem;color:red">لو غلطت ولو إجابة واحدة بس = الصورة دي هتطلعلك كامل الشاشة</p>
+  
+  <div id="question"></div>
+  <div class="options" id="options"></div>
+  <h2 id="score">الإجابات الصح: 0/5</h2>
+</h2>
+</div>
 
-<div id="screen">
-  <div class="text" style="color:red; font-size:8vw;">تحذير نهائي</div>
-  <div class="text" style="color:lime; margin-top:30px;">جهازك تم اختراقه</div>
-  <div class="text" style="color:white; margin-top:40px; font-size:3vw;">كل ملفاتك هتتمسح بعد...</div>
-  <div class="text" id="countdown" style="font-size:15vw; color:red; margin-top:40px;">10</div>
+<div id="jumpscare">
+  <img src="https://i.ibb.co/ycpqNMdy/384d2baf33ac078145f8f7ec36142417.jpg" alt="خلاص عليك">
 </div>
 
 <script>
-let time = 10;
-const countdown = document.getElementById('countdown');
-const scream = document.getElementById('scream');
-const bg = document.getElementById('bg');
+const questions = [
+  {q:"كام عدد أرجل العنكبوت؟", a:["6", "8", "10", "12"], correct:1},
+  {q:"أنهي كوكب أحمر؟", a:["الزهرة", "المريخ", "المشتري", "عطارد"], correct:1},
+  {q:"كام عين عند الإنسان الطبيعي؟", a:["1", "2", "3", "4"], correct:1},
+  {q:"أنهي حيوان بيبيض و بيرضع؟", a:["الدجاجة", "البطة", "الكنغر", "الخروف"], correct:2},
+  {q:"السؤال الأخير: هل أنت مستعد تموت دلوقتي؟", a:["لأ", "أيوه"], correct:0}
+];
 
-bg.play();
+let current = 0;
+let correctCount = 0;
 
-const timer = setInterval(() => {
-  time--;
-  countdown.textContent = time;
+const qDiv = document.getElementById('question');
+const optsDiv = document.getElementById('options');
+const scoreDiv = document.getElementById('score');
+const jumpscare = document.getElementById('jumpscare');
+const audio = document.getElementById('scary');
 
-  if(time <= 5) {
-    countdown.style.color = "red";
-    document.body.style.background = "#200";
-    setTimeout(() => document.body.style.background = "#000", 100);
+function showQuestion() {
+  if(current >= questions.length) {
+    document.getElementById('quiz').innerHTML = `<h1 style="color:lime">مبروك يا بطل<br>نجحت و لسه عايش!</h1>`;
+    return;
   }
 
-  if(time === 0) {
-    clearInterval(timer);
-    document.body.innerHTML = `
-      <div style="color:red; font-size:20vw; position:fixed; inset:0; display:flex; align-items:center; justify-content:center; animation:glitch 0.1s infinite;">
-        BYE BYE
-      </div>
-      <img src="https://i.ibb.co/ycpqNMdy/384d2baf33ac078145f8f7ec36142417.jpg" style="position:fixed; inset:0; width:100%; height:100%; object-fit:cover; opacity:0;" id="jumpscare">
-    `;
-    scream.play();
-    setTimeout(() => {
-      document.getElementById('jumpscare').style.opacity = "1";
-      document.body.style.animation = "shake 0.5s infinite";
-    }, 800);
-  }
-}, 800);
+  const ques = questions[current];
+  qDiv.innerHTML = `<div class="question">${ques.q}</div>`;
+  optsDiv.innerHTML = "";
 
- // اهتزاز الشاشة
-const shakeKeyframes = `
-@keyframes shake {
-  0% { transform: translate(1px, 1px) rotate(0deg); }
-  10% { transform: translate(-1px, -2px) rotate(-1deg); }
-  20% { transform: translate(-3px, 0px) rotate(1deg); }
-  30% { transform: translate(3px, 2px) rotate(0deg); }
-  40% { transform: translate(1px, -1px) rotate(1deg); }
-  50% { transform: translate(-1px, 2px) rotate(-1deg); }
-  60% { transform: translate(-3px, 1px) rotate(0deg); }
-  70% { transform: translate(3px, 1px) rotate(-1deg); }
-  80% { transform: translate(-1px, -1px) rotate(1deg); }
-  90% { transform: translate(1px, 2px) rotate(0deg); }
-  100% { transform: translate(1px, -2px) rotate(-1deg); }
+  ques.a.forEach((ans, i) => {
+    const btn = document.createElement('button');
+    btn.textContent = ans;
+    btn.onclick = () => {
+      if(i === ques.correct) {
+        correctCount++;
+        scoreDiv.textContent = `الإجابات الصح: ${correctCount}/5`;
+        current++;
+        setTimeout(showQuestion, 600);
+      } else {
+        // غلط = خلاص عليه
+        audio.play();
+        jumpscare.style.display = "block";
+        document.body.style.animation = "shake 0.5s infinite";
+        setTimeout(() => {
+          jumpscare.innerHTML += `<h1 style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:red;font-size:10vw;text-shadow:0 0 30px red">خلاص عليك</h1>`;
+        }, 500);
+      }
+    };
+    optsDiv.appendChild(btn);
+  });
 }
-`;
-document.head.insertAdjacentHTML('beforeend', `<style>${shakeKeyframes}</style>`);
+
+showQuestion();
 </script>
 
 </body>
