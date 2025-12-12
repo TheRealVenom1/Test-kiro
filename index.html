@@ -2,183 +2,150 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>تحذير أمان Google</title>
+<title>الاختبار الأخير - مافيش رجوع</title>
 <style>
-  body,html{margin:0;padding:0;height:100%;background:#fff;font-family:'Segoe UI',sans-serif;overflow:hidden}
-  
-  /* صفحة التحذير المزيفة زي جوجل بالظبط */
-  .warning-page{
-    display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#f9f9f9;color:#202124;padding:20px
-  }
-  .google-logo{
-    width:180px;margin-bottom:30px
-  }
-  .warning-icon{
-    font-size:120px;color:#d93025;margin-bottom:20px
-  }
-  h1{font-size:28px;color:#d93025;margin:10px 0}
-  p{font-size:18px;max-width:600px;text-align:center;line-height:1.6;color:#5f6368}
-  .buttons{margin-top:40px}
+  body,html{margin:0;padding:0;height:100%;background:#000;color:#0f0;font-family:'Courier New',monospace;overflow:hidden}
+  .container{max-width:900px;margin:40px auto;padding:20px;text-align:center}
+  h1{color:#f00;font-size:3.5rem;text-shadow:0 0 30px red}
+  .question{font-size:2.4rem;margin:50px 0;color:lime}
   button{
-    padding:12px 24px;margin:0 10px;font-size:16px;border:none;border-radius:8px;cursor:pointer;transition:0.3s
+    display:block;width:90%;margin:20px auto;padding:25px;font-size:1.7rem;
+    background:#111;border:2px solid #0f0;color:#0f0;cursor:pointer;border-radius:15px;transition:0.3s
   }
-  .back-btn{background:#dadce0;color:#3f3f3f}
-  .continue-btn{background:#d93025;color:#fff;font-weight:bold}
-  .continue-btn:hover{background:#b31414;transform:scale(1.05)}
-  
-  /* الكويز والجحيم (مخفي في الأول) */
-  .hidden{display:none}
+  button:hover{background:#0f0;color:#000;transform:scale(1.05)}
+
+  #countdown-screen{
+    display:none;position:fixed;inset:0;background:#000;color:red;
+    justify-content:center;align-items:center;flex-direction:column;z-index:9998
+  }
+  #timer{font-size:18vw;font-weight:900;text-shadow:0 0 0 80px red;animation:pulse 0.7s infinite}
+  #warn{font-size:4.5vw;margin-bottom:40px;color:#f00;text-shadow:0 0 30px}
+
+  #hell{display:none;position:fixed;inset:0;background:#000;z-index:9999;
+    justify-content:center;align-items:center;flex-direction:column}
+  #hell img{width:100%;height:100%;object-fit:contain}
+  .hacked{
+    position:absolute;color:red;font-size:12vw;font-weight:900;
+    text-shadow:0 0 60px #f00,0 0 120px #800;
+    animation:glitch 0.15s infinite;display:none
+  }
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+  @keyframes glitch{0%{text-shadow:10px 0 #f00,-10px 0 #0ff}50%{text-shadow:-10px 0 #f00,10px 0 #0f}}
+  @keyframes shake{0%,100%{transform:translate(0)}25%{transform:translate(-20px,20px)}50%{transform:translate(20px,-20px)}75%{transform:translate(-20px,-20px)}}
 </style>
 </head>
 <body>
 
-<!-- صفحة التحذير الأولى -->
-<div id="warning" class="warning-page">
-  <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" class="google-logo" alt="Google">
-  <div class="warning-icon">!</div>
-  <h1>هذا الموقع غير آمن</h1>
-  <p>
-    اكتشف متصفح Google أن هذا الموقع قد يحتوي على <strong>برمجيات خبيثة أو فيروسات</strong> تهدد جهازك وبياناتك الشخصية.<br><br>
-    يُنصح بشدة بعدم الدخول.
-  </p>
-  <div class="buttons">
-    <button class="back-btn" onclick="window.location='https://google.com'">رجوع إلى الأمان</button>
-    <button class="continue-btn" id="continue">أنا المسؤول - المتابعة على مسؤوليتي</button>
-  </div>
-</div>
-
-<!-- هنا الكويز + العد التنازلي + الجحيم (نفس الكود القديم بس مخفي) -->
-<div id="game" class="hidden">
-  <!-- كل الكود بتاع الكويز اللي فات هنا -->
-  <!-- هحطه كامل تحت عشان يشتغل 100% -->
-
+<!-- الأصوات (روابط مباشرة ومضمونة 100%) -->
 <audio id="beep" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_8d1f3b5f7d.mp3?filename=beep-warning-6387.mp3" preload="auto"></audio>
 <audio id="scream" loop preload="auto">
-  <source src="https://cdn.pixabay.com/download/audio/2024/03/18/audio_1d7bb2ce3a.mp3?filename=horror-screaming-211833.mp3">
+  <source src="https://cdn.pixabay.com/download/audio/2024/03/18/audio_1d7bb2ce3a.mp3?filename=horror-screaming-211833.mp3" type="audio/mpeg">
 </audio>
 
 <div class="container" id="quiz">
-  <h1 style="color:#f00">اختبار بسيط جدًا</h1>
+  <h1>اختبار بسيط جدًا</h1>
   <p style="font-size:2rem;color:#ff0">5 أسئلة.. لو غلطت = جهازك اتحكر في 10 ثواني</p>
   <div id="question"></div>
   <div id="options"></div>
   <div style="margin-top:40px;font-size:1.8rem;color:lime" id="score">الصحيح: 0/5</div>
 </div>
 
-<div id="countdown-screen" class="hidden">
-  <div style="color:red;font-size:4.5vw">سيتم اختراق جهازك خلال</div>
-  <div id="timer" style="font-size:18vw;color:red;text-shadow:0 0 80px red;animation:pulse 0.7s infinite">10</div>
+<!-- شاشة العد التنازلي -->
+<div id="countdown-screen">
+  <div id="warn">سيتم اختراق جهازك خلال</div>
+  <div id="timer">10</div>
 </div>
 
-<div id="hell" class="hidden">
-  <img src="https://i.ibb.co/ycpqNMdy/384d2baf33ac078145f8f7ec36142417.jpg" style="width:100%;height:100%;object-fit:contain">
-  <div style="position:absolute;color:red;font-size:12vw;top:30%;left:50%;transform:translateX(-50%);text-shadow:0 0 60px;text-align:center;animation:glitch 0.15s infinite;font-weight:900">
-    تم تهكيرك بنجاح
-  </div>
-  <div style="position:absolute;color:#0f0;font-size:9vw;top:70%;left:50%;transform:translateX(-50%);animation:glitch 0.2s infinite">
-    NO ESCAPE
-  </div>
-</div>
+<!-- الجحيم النهائي -->
+<div id="hell">
+  <img src="https://i.ibb.co/ycpqNMdy/384d2baf33ac078145f8f7ec36142417.jpg" alt="مات">
+  <div class="hacked" id="t1">تم تهكيرك بنجاح</div>
+  <div class="hacked" style="top:70%;font-size:9vw;color:#0f0" id="t2">NO ESCAPE</div>
 </div>
 
 <script>
-// فتح الصوت من أول ضغطة
-document.getElementById('continue').addEventListener('click', function() {
-  document.getElementById('warning').style.display = 'none';
-  document.getElementById('game').classList.remove('hidden');
-  
-  // فتح الصوت فورًا
-  document.getElementById('beep').play().catch(()=>{});
-  document.getElementById('scream').play().catch(()=>{}).then(()=>document.getElementById('scream').pause());
-  
-  startQuiz();
-});
+// فتح الصوت من أول ضغطة (حتى لو المتصفح بيحظر)
+let audioUnlocked = false;
+document.body.addEventListener('click', () => {
+  if(!audioUnlocked) {
+    document.getElementById('beep').play().catch(()=>{}); 
+    document.getElementById('scream').play().catch(()=>{}).then(()=>document.getElementById('scream').pause());
+    audioUnlocked = true;
+  }
+}, {once: true});
+
+const beep = document.getElementById('beep');
+const scream = document.getElementById('scream');
 
 const questions = [
-  {q:"كام عدد أرجل الدجاجة؟", a:["2", "4", "6", "8"], correct:1},
-  {q:"الشمس بتغرب فين؟", a:["شرق", "غرب", "شمال", "جنوب"], correct:1},
-  {q:"كام شهر في السنة؟", a:["10", "12", "14", "16"], correct:1},
-  {q:"المية بتغلي عند كام درجة؟", a:["50", "75", "100", "150"], correct:2},
-  {q:"هل أنت مستعد؟", a:["لأ", "أيوه"], correct:1}
+  {q:"القمر بيطلع إمتى؟", a:["الصبح", "بالليل", "الضهر", "ميطلعش"], correct:1},
+  {q:"كام عدد عجلات العربية؟", a:["3", "4", "5", "6"], correct:1},
+  {q:"لون الدم؟", a:["أزرق", "أحمر", "أخضر", "أصفر"], correct:1},
+  {q:"الكلب بياكل إيه؟", a:["عيش", "لحمة", "بيتزا", "كله"], correct:3},
+  {q:"هل أنت مستعد تموت؟", a:["أيوه", "لأ"], correct:1}
 ];
 
 let current = 0, correctCount = 0;
 
 function startCountdown() {
   document.getElementById('quiz').style.display = "none";
-  document.getElementById('countdown-screen').classList.remove('hidden');
+  document.getElementById('countdown-screen').style.display = "flex";
 
   let time = 10;
   const timer = document.getElementById('timer');
-  const beep = document.getElementById('beep');
   
-  const int = setInterval(() => {
+  const interval = setInterval(() => {
     time--;
     timer.textContent = time;
     beep.currentTime = 0;
     beep.play();
+
     if(time <= 0) {
-      clearInterval(int);
-      document.getElementById('countdown-screen').classList.add('hidden');
-      document.getElementById('hell').classList.remove('hidden');
-      document.getElementById('scream').currentTime = 0;
-      document.getElementById('scream').play();
+      clearInterval(interval);
+      document.getElementById('countdown-screen').style.display = "none";
+      document.getElementById('hell').style.display = "flex";
+      scream.currentTime = 0;
+      scream.play();
       document.body.style.animation = "shake 0.4s infinite";
+
       setTimeout(() => {
-        document.querySelectorAll('#hell div')[0].style.display = "block";
-        document.querySelectorAll('#hell div')[1].style.display = "block";
+        document.getElementById('t1').style.display = "block";
+        document.getElementById('t2').style.display = "block";
       }, 2000);
     }
   }, 1000);
 }
 
-function startQuiz() {
-  const qDiv = document.getElementById('question');
-  const optsDiv = document.getElementById('options');
-  const scoreDiv = document.getElementById('score');
-
-  function showQ() {
-    if(current >= questions.length) {
-      document.getElementById('quiz').innerHTML = `<h1 style="color:#0f0">مبروك.. كده كده اتحكرت 😂</h1>`;
-      setTimeout(startCountdown, 2500);
-      return;
-    }
-    const q = questions[current];
-    qDiv.innerHTML = `<div style="font-size:2.4rem;color:lime;margin:50px 0">${q.q}</div>`;
-    optsDiv.innerHTML = "";
-    q.a.forEach((a, i) => {
-      const b = document.createElement('button');
-      b.textContent = a;
-      b.style.cssText = "display:block;width:90%;margin:20px auto;padding:25px;font-size:1.7rem;background:#111;border:2px solid #0f0;color:#0f0;border-radius:15px;cursor:pointer";
-      b.onmouseover = () => b.style.background = "#0f0", b.style.color = "#000";
-      b.onmouseout = () => b.style.background = "#111", b.style.color = "#0f0";
-      b.onclick = () => {
-        if(i === q.correct) {
-          correctCount++;
-          scoreDiv.textContent = `الصحيح: ${correctCount}/5`;
-          current++;
-          setTimeout(showQ, 700);
-        } else {
-          startCountdown();
-        }
-      };
-      optsDiv.appendChild(b);
-    });
+function showQuestion() {
+  if(current >= questions.length) {
+    document.getElementById('quiz').innerHTML = `<h1 style="color:#0f0;font-size:4rem">مبروك.. كده كده اتحكرت 😂</h1>`;
+    setTimeout(startCountdown, 2500);
+    return;
   }
-  showQ();
-}
-</script>
 
-<!-- اهتزاز الشاشة -->
-<style>
-@keyframes shake{
-  0%,100%{transform:translate(0)}
-  10%,30%,50%,70%{transform:translate(-20px,0)}
-  20%,40%,60%,80%{transform:translate(20px,0)}
+  const q = questions[current];
+  document.getElementById('question').innerHTML = `<div class="question">${q.q}</div>`;
+  document.getElementById('options').innerHTML = "";
+
+  q.a.forEach((ans, i) => {
+    const btn = document.createElement('button');
+    btn.textContent = ans;
+    btn.onclick = () => {
+      if(i === q.correct) {
+        correctCount++;
+        document.getElementById('score').textContent = `الصحيح: ${correctCount}/5`;
+        current++;
+        setTimeout(showQuestion, 700);
+      } else {
+        startCountdown(); // غلط = عد تنازلي فوري
+      }
+    };
+    document.getElementById('options').appendChild(btn);
+  });
 }
-@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
-@keyframes glitch{0%,100%{text-shadow:10px 0 #f00,-10px 0 #0ff}50%{text-shadow:-10px 0 #f00,10px 0 #0f}}
-</style>
+
+showQuestion();
+</script>
 
 </body>
 </html>
