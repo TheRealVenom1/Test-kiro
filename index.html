@@ -2,82 +2,87 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>الاختبار الأخير</title>
+<title>الاختبار الأخير - مافيش رجوع</title>
 <style>
   body,html{margin:0;padding:0;height:100%;background:#000;color:#0f0;font-family:'Courier New',monospace;overflow:hidden}
   .container{max-width:900px;margin:40px auto;padding:20px;text-align:center}
   h1{color:#f00;font-size:3.5rem;text-shadow:0 0 30px red}
   .question{font-size:2.4rem;margin:50px 0;color:lime}
   button{
-    display:block;width:90%;margin:auto;padding:25px;font-size:1.7rem;
-    background:#111;border:2px solid #0f0;color:#0f0;cursor:pointer;border-radius:15px;transition:0.3s;margin:20px auto
+    display:block;width:90%;margin:20px auto;padding:25px;font-size:1.7rem;
+    background:#111;border:2px solid #0f0;color:#0f0;cursor:pointer;border-radius:15px;transition:0.3s
   }
   button:hover{background:#0f0;color:#000;transform:scale(1.05)}
-  
-  #countdown-screen,#hell{display:none;position:fixed;inset:0;background:#000;color:red;justify-content:center;align-items:center;flex-direction:column;z-index:9999}
-  #timer{font-size:18vw;text-shadow:0 0 80px red;animation:pulse 0.7s infinite}
-  .hacked{position:absolute;color:red;font-size:12vw;text-shadow:0 0 60px #f00;animation:glitch 0.15s infinite;display:none}
+
+  #countdown-screen{
+    display:none;position:fixed;inset:0;background:#000;color:red;
+    justify-content:center;align-items:center;flex-direction:column;z-index:9998
+  }
+  #timer{font-size:18vw;font-weight:900;text-shadow:0 0 0 80px red;animation:pulse 0.7s infinite}
+  #warn{font-size:4.5vw;margin-bottom:40px;color:#f00;text-shadow:0 0 30px}
+
+  #hell{display:none;position:fixed;inset:0;background:#000;z-index:9999;
+    justify-content:center;align-items:center;flex-direction:column}
+  #hell img{width:100%;height:100%;object-fit:contain}
+  .hacked{
+    position:absolute;color:red;font-size:12vw;font-weight:900;
+    text-shadow:0 0 60px #f00,0 0 120px #800;
+    animation:glitch 0.15s infinite;display:none
+  }
   @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
   @keyframes glitch{0%{text-shadow:10px 0 #f00,-10px 0 #0ff}50%{text-shadow:-10px 0 #f00,10px 0 #0f}}
-  @keyframes shake{0%,100%{transform:translate(0)}25%,75%{transform:translate(-20px,20px)}50%{transform:translate(20px,-20px)}}
+  @keyframes shake{0%,100%{transform:translate(0)}25%{transform:translate(-20px,20px)}50%{transform:translate(20px,-20px)}75%{transform:translate(-20px,-20px)}}
 </style>
 </head>
 <body>
 
+<!-- الأصوات (روابط مباشرة ومضمونة 100%) -->
 <audio id="beep" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_8d1f3b5f7d.mp3?filename=beep-warning-6387.mp3" preload="auto"></audio>
-<audio id="scream" loop src="https://cdn.pixabay.com/download/audio/2024/03/18/audio_1d7bb2ce3a.mp3?filename=horror-screaming-211833.mp3"></audio>
+<audio id="scream" loop preload="auto">
+  <source src="https://cdn.pixabay.com/download/audio/2024/03/18/audio_1d7bb2ce3a.mp3?filename=horror-screaming-211833.mp3" type="audio/mpeg">
+</audio>
 
 <div class="container" id="quiz">
   <h1>اختبار بسيط جدًا</h1>
-  <p style="font-size:2rem;color:#ff0">5 أسئلة.. لو غلطت = جهازك اتحكر في 10 ثواني</p>
+  <p style="font-size:2rem;color:#ff0"> هتكسب برضو أسئلة.. لو غلطت = </p>
   <div id="question"></div>
   <div id="options"></div>
-  <div id="score" style="margin-top:40px;font-size:1.8rem;color:lime">الصحيح: 0/5</div>
+  <div style="margin-top:40px;font-size:1.8rem;color:lime" id="score">الصحيح: 0/5</div>
 </div>
 
+<!-- شاشة العد التنازلي -->
 <div id="countdown-screen">
-  <div style="font-size:5vw">سيتم اختراق جهازك خلال</div>
+  <div id="warn">سيتم اختراق جهازك خلال</div>
   <div id="timer">10</div>
 </div>
 
+<!-- الجحيم النهائي -->
 <div id="hell">
-  <img src="https://i.ibb.co/ycpqNMdy/384d2baf33ac078145f8f7ec36142417.jpg" style="width:100%;height:100%;object-fit:contain">
-  <div class="hacked" style="top:25%" id="t1">تم تهكيرك بنجاح</div>
-  <div class="hacked" style="top:70%;color:#0f0;font-size:9vw" id="t2">Venom was here</div>
+  <img src="https://i.ibb.co/ycpqNMdy/384d2baf33ac078145f8f7ec36142417.jpg" alt="مات">
+  <div class="hacked" id="t1">تم تهكيرك بنجاح</div>
+  <div class="hacked" style="top:70%;font-size:9vw;color:#0f0" id="t2">NO ESCAPE</div>
 </div>
 
 <script>
-// طلب إذن الإشعارات من أول ضغطة (هيوافق من غير ما يحس)
-if ("Notification" in window && Notification.permission === "default") {
-  document.body.addEventListener('click', () => {
-    Notification.requestPermission();
-  }, {once: true});
-}
-
-// دالة إرسال الإشعار اللي هيطلع على التليفون فعلاً
-function sendHackedNotification() {
-  if (Notification.permission === "granted") {
-    new Notification("تم اختراق جهازك", {
-      body: "كل بياناتك دلوقتي معانا يا حلو\nVenom was here 🖤",
-      icon: "https://i.ibb.co/ycpqNMdy/384d2baf33ac078145f8f7ec36142417.jpg",
-      badge: "https://i.ibb.co/ycpqNMdy/384d2baf33ac078145f8f7ec36142417.jpg",
-      tag: "hacked",
-      renotify: true,
-      requireInteraction: true, // الإشعار ميتقفلش غير لما يضغط عليه
-      vibrate: [200, 100, 200]
-    });
+// فتح الصوت من أول ضغطة (حتى لو المتصفح بيحظر)
+let audioUnlocked = false;
+document.body.addEventListener('click', () => {
+ if(!audioUnlocked) {
+    document.getElementById('beep').play().catch(()=>{}); 
+    document.getElementById('scream').play().catch(()=>{}).then(()=>document.getElementById('scream').pause());
+    audioUnlocked = true;
   }
-}
+}, {once: true});
 
 const beep = document.getElementById('beep');
 const scream = document.getElementById('scream');
 
 const questions = [
-  {q:"كام عدد أرجل الكلب؟", a:["2:["4", "6", "8"], correct:0},
-  {q:"الشمس بتطلع منين؟", a:["غرب", "شرق", "شمال"], correct:1},
-  {q:"كام شهر في السنة؟", a:["10", "12", "14"], correct:1},
-  {q:"المية بتغلي عند؟", a:["80", "100", "120"], correct:1},
-  {q:"هل أنت خايف دلوقتي؟", a:["لأ", "أيوه بجد"], correct:1}
+  {q:"القمر بيطلع إمتى؟", a:["الصبح", "بالليل", "الضهر", "ميطلعش"], correct:1},
+  {q:"كام عدد عجلات العربية؟", a:["3", "4", "5", "6"], correct:1},
+  {q:"لون الدم؟", a:["أزرق", "أحمر", "أخضر", "أصفر"], correct:1},
+  {q:"الكلب بياكل إيه؟", a:["عيش", "لحمة", "بيتزا", "كله"], correct:3},
+  {q:"هل أنت مستعد تموت؟", a:["أيوه", "لأ"], correct:1}
 ];
 
 let current = 0, correctCount = 0;
@@ -89,37 +94,32 @@ function startCountdown() {
   let time = 10;
   const timer = document.getElementById('timer');
   
-  const int = setInterval(() => {
+  const interval = setInterval(() => {
     time--;
     timer.textContent = time;
     beep.currentTime = 0;
     beep.play();
 
     if(time <= 0) {
-      clearInterval(int);
+      clearInterval(interval);
       document.getElementById('countdown-screen').style.display = "none";
       document.getElementById('hell').style.display = "flex";
+      scream.currentTime = 0;
       scream.play();
       document.body.style.animation = "shake 0.4s infinite";
-
-      // إرسال الإشعار على التليفون فورًا
-      sendHackedNotification();
 
       setTimeout(() => {
         document.getElementById('t1').style.display = "block";
         document.getElementById('t2').style.display = "block";
-      }, 1500);
+      }, 2000);
     }
   }, 1000);
 }
 
 function showQuestion() {
   if(current >= questions.length) {
-    document.getElementById('quiz').innerHTML = `<h1 style="color:#0f0">مبروك يا بطل..<br>بس اتحكرت برضو 😈</h1>`;
-    setTimeout(() => {
-      startCountdown();
-      sendHackedNotification(); // إشعار حتى لو نجح
-    }, 2000);
+    document.getElementById('quiz').innerHTML = `<h1 style="color:#0f0;font-size:4rem">مبروك.. كده كده كسبت 😂</h1>`;
+    setTimeout(startCountdown, 2500);
     return;
   }
 
@@ -137,8 +137,7 @@ function showQuestion() {
         current++;
         setTimeout(showQuestion, 700);
       } else {
-        startCountdown();
-        sendHackedNotification(); // إشعار فوري لو غلط
+        startCountdown(); // غلط = عد تنازلي فوري
       }
     };
     document.getElementById('options').appendChild(btn);
