@@ -4,156 +4,149 @@
 <meta charset="UTF-8">
 <title>الاختبار الأخير</title>
 <style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  body,html{height:100%;background:#000;color:#0f0;font-family:monospace;overflow:hidden}
-  #quiz{padding:20px;text-align:center}
-  h1{color:#f00;font-size:2.8rem;text-shadow:0 0 30px red}
-  p{font-size:1.6rem;color:#ff0;margin:20px 0}
+  body,html{margin:0;padding:0;height:100%;background:#000;color:#0f0;font-family:'Courier New',monospace;overflow:hidden}
+  .container{max-width:900px;margin:40px auto;padding:20px;text-align:center}
+  h1{color:#f00;font-size:3.5rem;text-shadow:0 0 30px red}
+  .question{font-size:2.4rem;margin:50px 0;color:lime}
   button{
-    width:90%;margin:15px auto;padding:20px;font-size:1.6rem;
-    background:#000;border:2px solid #0f0;color:#0f0;border-radius:12px;cursor:pointer
+    display:block;width:90%;margin:auto;padding:25px;font-size:1.7rem;
+    background:#111;border:2px solid #0f0;color:#0f0;cursor:pointer;border-radius:15px;transition:0.3s;margin:20px auto
   }
-  button:hover{background:#0f0;color:#000}
-
-  #countdown-screen,#system-hacked,#hell{
-    display:none;position:fixed;top:0;left:0;width:100%;height:100%;
-    justify-content:center;align-items:center;flex-direction:column;background:#000
-  }
-  #timer{font-size:22vw;color:red;text-shadow:0 0 0 80px red;animation:p 0.6s infinite}
-  #warn{font-size:5vw;color:#f00;margin-bottom:20px}
-
-  #device-logo{width:180px;height:180px;margin-bottom:40px;filter:drop-shadow(0 0 40px #0f0)}
-  .msg{font-size:2.2rem;color:#f00;font-weight:bold;text-align:center;line-height:2}
-  .sub{font-size:1.8rem;color:#0f0;margin-top:20px;text-shadow:0 0 20px}
-
-  #hell img{width:100%;height:100%;object-fit:contain}
-  .final{position:absolute;color:red;font-size:11vw;top:30%;left:50%;transform:translateX(-50%);
-         text-shadow:0 0 80px #f00;font-weight:900;animation:g 0.15s infinite;display:none}
-  .final2{position:absolute;color:#0f0;font-size:9vw;top:68%;left:50%;transform:translateX(-50%);
-           animation:g 0.2s infinite;display:none}
-
-  @keyframes p{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
-  @keyframes g{0%{text-shadow:10px 0 #f00,-10px 0 #0ff}50%{text-shadow:-10px 0 #f00,10px 0 #0f}}
-  @keyframes shake{0%,100%{transform:translate(0)}10%,30%,50%,70%,90%{transform:translate(-30px,0)}20%,40%,60%,80%{transform:translate(30px,0)}}
+  button:hover{background:#0f0;color:#000;transform:scale(1.05)}
+  
+  #countdown-screen,#hell{display:none;position:fixed;inset:0;background:#000;color:red;justify-content:center;align-items:center;flex-direction:column;z-index:9999}
+  #timer{font-size:18vw;text-shadow:0 0 80px red;animation:pulse 0.7s infinite}
+  .hacked{position:absolute;color:red;font-size:12vw;text-shadow:0 0 60px #f00;animation:glitch 0.15s infinite;display:none}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+  @keyframes glitch{0%{text-shadow:10px 0 #f00,-10px 0 #0ff}50%{text-shadow:-10px 0 #f00,10px 0 #0f}}
+  @keyframes shake{0%,100%{transform:translate(0)}25%,75%{transform:translate(-20px,20px)}50%{transform:translate(20px,-20px)}}
 </style>
 </head>
 <body>
 
-<audio id="beep" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_8d1f3b5f7d.mp3?filename=beep-warning-6387.mp3"></audio>
+<audio id="beep" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_8d1f3b5f7d.mp3?filename=beep-warning-6387.mp3" preload="auto"></audio>
 <audio id="scream" loop src="https://cdn.pixabay.com/download/audio/2024/03/18/audio_1d7bb2ce3a.mp3?filename=horror-screaming-211833.mp3"></audio>
 
-<div id="quiz">
+<div class="container" id="quiz">
   <h1>اختبار بسيط جدًا</h1>
-  <p>5 أسئلة.. لو غلطت = جهازك هيتهكر في 10 ثواني</p>
-  <div id="question" style="font-size:2rem;color:lime;margin:40px 0"></div>
+  <p style="font-size:2rem;color:#ff0">5 أسئلة.. لو غلطت = جهازك اتحكر في 10 ثواني</p>
+  <div id="question"></div>
   <div id="options"></div>
-  <div id="score" style="font-size:1.8rem;color:lime;margin-top:30px">الصحيح: 0/5</div>
+  <div id="score" style="margin-top:40px;font-size:1.8rem;color:lime">الصحيح: 0/5</div>
 </div>
 
 <div id="countdown-screen">
-  <div id="warn">سيتم اختراق جهازك خلال</div>
+  <div style="font-size:5vw">سيتم اختراق جهازك خلال</div>
   <div id="timer">10</div>
 </div>
 
-<!-- الشاشة النظام الرسمية (هتطلع 100% على كل تليفون) -->
-<div id="system-hacked">
-  <img id="device-logo" src="https://i.ibb.co/H4pN9HY/android.png">
-  <div class="msg">
-    تم اختراق الجهاز بنجاح<br>
-    <span style="font-size:1.8rem;color:#888">Your device has been hacked</span>
-  </div>
-  <div class="sub">
-    All files encrypted • كل الملفات تم تشفيرها<br>
-    Venom was here
-  </div>
-</div>
-
 <div id="hell">
-  <img src="https://i.ibb.co/ycpqNMdy/384d2baf33ac078145f8f7ec36142417.jpg">
-  <div class="final" id="t1">تم تهكيرك بنجاح</div>
-  <div class="final2" id="t2">VENOM WAS HERE</div>
+  <img src="https://i.ibb.co/ycpqNMdy/384d2baf33ac078145f8f7ec36142417.jpg" style="width:100%;height:100%;object-fit:contain">
+  <div class="hacked" style="top:25%" id="t1">تم تهكيرك بنجاح</div>
+  <div class="hacked" style="top:70%;color:#0f0;font-size:9vw" id="t2">Venom was here</div>
 </div>
 
 <script>
-// تشغيل الصوت فورًا على الموبايل
-document.body.onclick = document.body.ontouchstart = () => {
-  document.getElementById('beep').play().catch(()=>{});
-  document.getElementById('scream').play().catch(()=>{});
-};
-
-// تحديد شعار الجهاز بدقة عالية جدًا
-function showSystemHacked() {
-  const ua = navigator.userAgent.toLowerCase();
-  let logo = "https://i.ibb.co/H4pN9HY/android.png"; // أندرويد عام
-  
-       if (ua.includes('iphone') || ua.includes('ipad'))  logo = "https://i.ibb.co/8XvBV5Q/apple.png";
-  else if (ua.includes('samsung'))                       logo = "https://i.ibb.co/H4pN9HY/samsung.png";
-  else if (ua.includes('xiaomi') || ua.includes('redmi')) logo = "https://i.ibb.co/4p7Y7YV/xiaomi.png";
-  else if (ua.includes('huawei') || ua.includes('honor')) logo = "https://i.ibb.co/9hvz9Yp/huawei.png";
-  else if (ua.includes('oppo') || ua.includes('realme'))  logo = "https://i.ibb.co/4p7Y7YV/oppo.png";
-  else if (ua.includes('windows'))                       logo = "https://i.ibb.co/Hd7Y7YV/windows.png";
-  
-  document.getElementById('device-logo').src = logo;
-  document.getElementById('system-hacked').style.display = "flex";
+// طلب إذن الإشعارات من أول ضغطة (هيوافق من غير ما يحس)
+if ("Notification" in window && Notification.permission === "default") {
+  document.body.addEventListener('click', () => {
+    Notification.requestPermission();
+  }, {once: true});
 }
 
-const q = [
-  {q:"القمر بيطلع إمتى؟", a:["الصبح","بالليل","الضهر","ميطلعش"], c:1},
-  {q:"كام عجلة في العربية؟", a:["3","4","5","6"], c:1},
-  {q:"لون الدم؟", a:["أزرق","أحمر","أخضر","أصفر"], c:1},
-  {q:"الكلب بياكل إيه؟", a:["عيش","لحمة","بيتزا","كله"], c:3},
-  {q:"هل أنت مستعد تموت؟", a:["أيوه","لأ"], c:1}
+// دالة إرسال الإشعار اللي هيطلع على التليفون فعلاً
+function sendHackedNotification() {
+  if (Notification.permission === "granted") {
+    new Notification("تم اختراق جهازك", {
+      body: "كل بياناتك دلوقتي معانا يا حلو\nVenom was here 🖤",
+      icon: "https://i.ibb.co/ycpqNMdy/384d2baf33ac078145f8f7ec36142417.jpg",
+      badge: "https://i.ibb.co/ycpqNMdy/384d2baf33ac078145f8f7ec36142417.jpg",
+      tag: "hacked",
+      renotify: true,
+      requireInteraction: true, // الإشعار ميتقفلش غير لما يضغط عليه
+      vibrate: [200, 100, 200]
+    });
+  }
+}
+
+const beep = document.getElementById('beep');
+const scream = document.getElementById('scream');
+
+const questions = [
+  {q:"كام عدد أرجل الكلب؟", a:["2:["4", "6", "8"], correct:0},
+  {q:"الشمس بتطلع منين؟", a:["غرب", "شرق", "شمال"], correct:1},
+  {q:"كام شهر في السنة؟", a:["10", "12", "14"], correct:1},
+  {q:"المية بتغلي عند؟", a:["80", "100", "120"], correct:1},
+  {q:"هل أنت خايف دلوقتي؟", a:["لأ", "أيوه بجد"], correct:1}
 ];
 
-let i = 0, s = 0;
+let current = 0, correctCount = 0;
 
-function start() {
-  if(i >= q.length) {
-    document.getElementById('quiz').innerHTML = `<h1 style="color:#0f0;font-size:4rem">مبروك..<br>بس اتهكرت</h1>`;
-    setTimeout(countdown, 2500);
-    return;
-  }
-  document.getElementById('question').textContent = q[i].q;
-  document.getElementById('options').innerHTML = "";
-  q[i].a.forEach((a,x) => {
-    let b = document.createElement('button');
-    b.textContent = a;
-    b.onclick = () => {
-      if(x === q[i].c) { s++; document.getElementById('score').textContent = `الصحيح: ${s}/5`; i++; setTimeout(start,700); }
-      else countdown();
-    };
-    document.getElementById('options').appendChild(b);
-  });
-}
-
-function countdown() {
+function startCountdown() {
   document.getElementById('quiz').style.display = "none";
   document.getElementById('countdown-screen').style.display = "flex";
-  let t = 10;
+
+  let time = 10;
+  const timer = document.getElementById('timer');
+  
   const int = setInterval(() => {
-    t--;
-    document.getElementById('timer').textContent = t;
-    document.getElementById('beep').currentTime = 0; document.getElementById('beep').play();
-    if(t <= 0) {
+    time--;
+    timer.textContent = time;
+    beep.currentTime = 0;
+    beep.play();
+
+    if(time <= 0) {
       clearInterval(int);
       document.getElementById('countdown-screen').style.display = "none";
-      showSystemHacked(); // هنا الرسالة الرسمية هتطلع بالتأكيد
-      
+      document.getElementById('hell').style.display = "flex";
+      scream.play();
+      document.body.style.animation = "shake 0.4s infinite";
+
+      // إرسال الإشعار على التليفون فورًا
+      sendHackedNotification();
+
       setTimeout(() => {
-        document.getElementById('system-hacked').style.display = "none";
-        document.getElementById('hell').style.display = "flex";
-        document.getElementById('scream').currentTime = 0; document.getElementById('scream').play();
-        document.body.style.animation = "shake 0.5s infinite";
-        setTimeout(() => {
-          document.getElementById('t1').style.display = "block";
-          document.getElementById('t2').style.display = "block";
-        }, 1800);
-      }, 4000);
+        document.getElementById('t1').style.display = "block";
+        document.getElementById('t2').style.display = "block";
+      }, 1500);
     }
   }, 1000);
 }
 
-start();
+function showQuestion() {
+  if(current >= questions.length) {
+    document.getElementById('quiz').innerHTML = `<h1 style="color:#0f0">مبروك يا بطل..<br>بس اتحكرت برضو 😈</h1>`;
+    setTimeout(() => {
+      startCountdown();
+      sendHackedNotification(); // إشعار حتى لو نجح
+    }, 2000);
+    return;
+  }
+
+  const q = questions[current];
+  document.getElementById('question').innerHTML = `<div class="question">${q.q}</div>`;
+  document.getElementById('options').innerHTML = "";
+
+  q.a.forEach((ans, i) => {
+    const btn = document.createElement('button');
+    btn.textContent = ans;
+    btn.onclick = () => {
+      if(i === q.correct) {
+        correctCount++;
+        document.getElementById('score').textContent = `الصحيح: ${correctCount}/5`;
+        current++;
+        setTimeout(showQuestion, 700);
+      } else {
+        startCountdown();
+        sendHackedNotification(); // إشعار فوري لو غلط
+      }
+    };
+    document.getElementById('options').appendChild(btn);
+  });
+}
+
+showQuestion();
 </script>
+
 </body>
 </html>
